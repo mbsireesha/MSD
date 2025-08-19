@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freelancer Platform</title>
+  <style>
+    body {margin:0;font-family:Arial, sans-serif;}
+    .navbar {
+      display:flex;justify-content:space-between;align-items:center;
+      background:#fff;padding:10px 30px;box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      position:fixed;width:100%;top:0;z-index:1000;
+      animation: slideDown 0.6s ease;
+    }
+    .navbar a {margin:0 10px;text-decoration:none;color:#333;font-weight:bold;cursor:pointer;transition:color 0.3s;}
+    .navbar a:hover {color:#ff00a0;}
+
+    /* Hero Section */
+    .hero {
+      height:100vh;
+      background:url('https://images.unsplash.com/photo-1519389950473-47ba0277781c') no-repeat center center/cover;
+      position:relative;display:flex;flex-direction:column;
+      justify-content:center;align-items:center;color:#fff;text-align:center;
+      padding:0 20px;animation: fadeIn 1.2s ease-in-out;
+    }
+    .hero::before {
+      content:"";position:absolute;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);
+    }
+    .hero h1, .hero p {position:relative;z-index:1;}
+    .hero h1 {font-size:50px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(0,0,0,0.7);}
+    .hero p {font-size:20px;max-width:700px;text-shadow:1px 1px 5px rgba(0,0,0,0.6);}
+
+    /* Full page forms and sections */
+    .page {
+      display:none;height:100vh;position:relative;
+      display:flex;justify-content:center;align-items:center;
+      text-align:center;color:#fff;padding:20px;flex-direction:column;
+      overflow-y:auto;opacity:0;transition:opacity 0.6s ease;
+    }
+    .page.active {opacity:1;animation: fadeInUp 0.8s ease;}
+    .page::before {
+      content:"";position:absolute;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+    }
+    .page-content {position:relative;z-index:1;max-width:1000px;}
+    .page h2 {font-size:40px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(0,0,0,0.7);}
+    .page p {font-size:18px;line-height:1.6;text-shadow:1px 1px 4px rgba(0,0,0,0.6);}
+
+    /* Job cards */
+    .jobs {display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:30px;}
+    .job-card {
+      background:#fff;color:#000;padding:20px;border-radius:10px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.2);text-align:left;
+      transform:translateY(20px);opacity:0;animation: fadeInUp 0.8s ease forwards;
+    }
+    .job-card:nth-child(1){animation-delay:0.2s;}
+    .job-card:nth-child(2){animation-delay:0.4s;}
+    .job-card:nth-child(3){animation-delay:0.6s;}
+    .job-card:nth-child(4){animation-delay:0.8s;}
+    .job-card h3 {margin:0 0 10px;}
+    .job-card p {margin:0 0 10px;font-size:14px;color:#555;}
+    .job-card button {
+      background:#ff00a0;color:#fff;border:none;padding:8px 15px;
+      border-radius:6px;cursor:pointer;font-size:14px;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .job-card button:hover {background:#cc0085;transform:scale(1.05);}
+    .job-card button:active {transform:scale(0.95);}
+
+    /* Form styling */
+    .form-box {
+      background:#fff;padding:30px;border-radius:10px;width:350px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.3);position:relative;z-index:1;color:#000;
+      animation: zoomIn 0.6s ease;
+    }
+    .form-box h2 {margin-bottom:20px;text-align:center;}
+    .form-box input {
+      width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px;
+    }
+    .form-box button {
+      width:100%;padding:10px;margin-top:15px;background:#ff00a0;color:#fff;
+      border:none;border-radius:6px;cursor:pointer;transition:transform 0.2s, background 0.3s;
+    }
+    .form-box button:hover {background:#cc0085;transform:scale(1.05);}
+    .form-box button:active {transform:scale(0.95);}
+    .back-btn {
+      display:block;margin-top:15px;text-align:center;color:#333;cursor:pointer;
+      transition:color 0.3s;
+    }
+    .back-btn:hover {color:#ff00a0;}
+
+    /* Search bar */
+    .search-bar {
+      margin:20px 0;
+    }
+    .search-bar input {
+      padding:10px;width:100%;max-width:400px;border:1px solid #ccc;border-radius:6px;
+    }
+
+    /* Background images */
+    #login {background:url('https://images.unsplash.com/photo-1518770660439-4636190af475') no-repeat center center/cover;}
+    #signup {background:url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d') no-repeat center center/cover;}
+    #howitworks {background:url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d') no-repeat center center/cover;}
+    #browsejobs {background:url('https://images.unsplash.com/photo-1551434678-e076c223a692') no-repeat center center/cover;}
+
+    /* Animations */
+    @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+    @keyframes fadeInUp {from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes zoomIn {from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:scale(1);}}
+    @keyframes slideDown {from{transform:translateY(-50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Freelancer_Logo.png" alt="Freelancer" height="30"></div>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('howitworks')">How It Works</a>
+      <a onclick="showPage('browsejobs')">Browse Jobs</a>
+    </div>
+    <div class="auth-links">
+      <a onclick="showPage('login')">Log In</a> | 
+      <a onclick="showPage('signup')">Sign Up</a>
+    </div>
+  </div>
+
+  <!-- Home -->
+  <div class="hero page active" id="home">
+    <h1>Welcome to Freelancer Client Platform</h1>
+    <p>Work smarter with the world’s largest freelance platform. Post your project, connect with professionals, and bring your ideas to life. Explore thousands of skilled freelancers ready to deliver quality results.</p>
+  </div>
+
+  <!-- How It Works -->
+  <div class="page" id="howitworks">
+    <div class="page-content">
+      <h2>How It Works</h2>
+      <p>Our platform connects businesses with skilled freelancers across the globe. Post your project, set your budget, and choose from thousands of qualified experts. Track progress in real-time, communicate with ease, and pay only when satisfied. It’s fast, flexible, and secure – designed to help your ideas succeed.</p>
+    </div>
+  </div>
+
+  <!-- Browse Jobs -->
+  <div class="page" id="browsejobs">
+    <div class="page-content">
+      <h2>Browse Jobs</h2>
+      <p>Explore the latest freelance opportunities waiting for you:</p>
+      <div class="search-bar">
+        <input type="text" id="jobSearch" placeholder="Search jobs..." onkeyup="filterJobs()">
+      </div>
+      <div class="jobs" id="jobList">
+        <div class="job-card"><h3>Web Developer Needed</h3><p>Build a responsive company website using React and Node.js.</p><p><b>Budget:</b> $500 - $1000</p><button>Apply Now</button></div>
+        <div class="job-card"><h3>Logo Designer</h3><p>Create a modern and minimal logo for a startup brand.</p><p><b>Budget:</b> $50 - $150</p><button>Apply Now</button></div>
+        <div class="job-card"><h3>Content Writer</h3><p>Write SEO-friendly blog articles for a travel website.</p><p><b>Budget:</b> $20/article</p><button>Apply Now</button></div>
+        <div class="job-card"><h3>Mobile App Developer</h3><p>Develop an Android app for food delivery services.</p><p><b>Budget:</b> $1000 - $3000</p><button>Apply Now</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div class="page" id="login">
+    <div class="form-box">
+      <h2>Client Login</h2>
+      <input type="text" placeholder="Username">
+      <input type="password" placeholder="Password">
+      <button onclick="checkLogin()">Login</button>
+      <div class="back-btn" onclick="showPage('home')">← Back to Home</div>
+    </div>
+  </div>
+
+  <!-- Signup -->
+  <div class="page" id="signup">
+    <div class="form-box">
+      <h2>Freelancer Sign Up</h2>
+      <input type="text" placeholder="Username">
+      <input type="password" placeholder="Password">
+      <input type="email" placeholder="Email">
+      <input type="text" placeholder="Contact No">
+      <input type="text" placeholder="Skills Known">
+      <button>Sign Up</button>
+      <div class="back-btn" onclick="showPage('home')">← Back to Home</div>
+    </div>
+  </div>
+
+  <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => {
+        p.style.display="none"; 
+        p.classList.remove("active");
+      });
+      let page = document.getElementById(pageId);
+      page.style.display="flex";
+      setTimeout(()=>page.classList.add("active"),50);
+    }
+
+    function checkLogin() {
+      let username = document.querySelector("#login input[type='text']").value;
+      let password = document.querySelector("#login input[type='password']").value;
+      if(username === "admin" && password === "1234"){
+        alert("Login Successful!");
+        showPage('home');
+      } else {
+        alert("Incorrect Username or Password");
+      }
+    }
+
+    function filterJobs() {
+      let input = document.getElementById("jobSearch").value.toLowerCase();
+      let jobs = document.getElementById("jobList").getElementsByClassName("job-card");
+      for (let i = 0; i < jobs.length; i++) {
+        let jobText = jobs[i].innerText.toLowerCase();
+        jobs[i].style.display = jobText.includes(input) ? "" : "none";
+      }
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freelancer Platform</title>
+  <style>
+    body {margin:0;font-family:Arial, sans-serif;}
+    .navbar {
+      display:flex;justify-content:space-between;align-items:center;
+      background:#fff;padding:10px 30px;box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      position:fixed;width:100%;top:0;z-index:1000;
+      animation: slideDown 0.6s ease;
+    }
+    .navbar a {margin:0 10px;text-decoration:none;color:#333;font-weight:bold;cursor:pointer;transition:color 0.3s;}
+    .navbar a:hover {color:#ff00a0;}
+
+    /* Hero Section */
+    .hero {
+      height:100vh;
+      background:url('https://images.unsplash.com/photo-1519389950473-47ba0277781c') no-repeat center center/cover;
+      position:relative;display:flex;flex-direction:column;
+      justify-content:center;align-items:center;color:#fff;text-align:center;
+      padding:0 20px;animation: fadeIn 1.2s ease-in-out;
+    }
+    .hero::before {
+      content:"";position:absolute;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.55);backdrop-filter:blur(3px);
+    }
+    .hero h1, .hero p {position:relative;z-index:1;}
+    .hero h1 {font-size:50px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(0,0,0,0.7);}
+    .hero p {font-size:20px;max-width:700px;text-shadow:1px 1px 5px rgba(0,0,0,0.6);}
+
+    /* Full page forms and sections */
+    .page {
+      display:none;height:100vh;position:relative;
+      display:flex;justify-content:center;align-items:center;
+      text-align:center;color:#fff;padding:20px;flex-direction:column;
+      overflow-y:auto;opacity:0;transition:opacity 0.6s ease;
+    }
+    .page.active {opacity:1;animation: fadeInUp 0.8s ease;}
+    .page::before {
+      content:"";position:absolute;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);
+    }
+    .page-content {position:relative;z-index:1;max-width:1000px;}
+    .page h2 {font-size:40px;margin-bottom:20px;text-shadow:2px 2px 6px rgba(0,0,0,0.7);}
+    .page p {font-size:18px;line-height:1.6;text-shadow:1px 1px 4px rgba(0,0,0,0.6);}
+
+    /* Job cards */
+    .jobs {display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-top:30px;}
+    .job-card {
+      background:#fff;color:#000;padding:20px;border-radius:10px;
+      box-shadow:0 4px 10px rgba(0,0,0,0.2);text-align:left;
+      transform:translateY(20px);opacity:0;animation: fadeInUp 0.8s ease forwards;
+    }
+    .job-card:nth-child(1){animation-delay:0.2s;}
+    .job-card:nth-child(2){animation-delay:0.4s;}
+    .job-card:nth-child(3){animation-delay:0.6s;}
+    .job-card:nth-child(4){animation-delay:0.8s;}
+    .job-card h3 {margin:0 0 10px;}
+    .job-card p {margin:0 0 10px;font-size:14px;color:#555;}
+    .job-card button {
+      background:#ff00a0;color:#fff;border:none;padding:8px 15px;
+      border-radius:6px;cursor:pointer;font-size:14px;
+      transition: transform 0.2s, background 0.3s;
+    }
+    .job-card button:hover {background:#cc0085;transform:scale(1.05);}
+    .job-card button:active {transform:scale(0.95);}
+
+    /* Form styling */
+    .form-box {
+      background:#fff;padding:30px;border-radius:10px;width:350px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.3);position:relative;z-index:1;color:#000;
+      animation: zoomIn 0.6s ease;
+    }
+    .form-box h2 {margin-bottom:20px;text-align:center;}
+    .form-box input {
+      width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:6px;
+    }
+    .form-box button {
+      width:100%;padding:10px;margin-top:15px;background:#ff00a0;color:#fff;
+      border:none;border-radius:6px;cursor:pointer;transition:transform 0.2s, background 0.3s;
+    }
+    .form-box button:hover {background:#cc0085;transform:scale(1.05);}
+    .form-box button:active {transform:scale(0.95);}
+    .back-btn {
+      display:block;margin-top:15px;text-align:center;color:#333;cursor:pointer;
+      transition:color 0.3s;
+    }
+    .back-btn:hover {color:#ff00a0;}
+
+    /* Search bar */
+    .search-bar {
+      margin:20px 0;
+    }
+    .search-bar input {
+      padding:10px;width:100%;max-width:400px;border:1px solid #ccc;border-radius:6px;
+    }
+
+    /* Background images */
+    #login {background:url('https://images.unsplash.com/photo-1518770660439-4636190af475') no-repeat center center/cover;}
+    #signup {background:url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d') no-repeat center center/cover;}
+    #howitworks {background:url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d') no-repeat center center/cover;}
+    #browsejobs {background:url('https://images.unsplash.com/photo-1551434678-e076c223a692') no-repeat center center/cover;}
+
+    /* Animations */
+    @keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+    @keyframes fadeInUp {from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+    @keyframes zoomIn {from{opacity:0;transform:scale(0.8);}to{opacity:1;transform:scale(1);}}
+    @keyframes slideDown {from{transform:translateY(-50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <div class="logo"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3f/Freelancer_Logo.png" alt="Freelancer" height="30"></div>
+    <div class="nav-links">
+      <a onclick="showPage('home')">Home</a>
+      <a onclick="showPage('howitworks')">How It Works</a>
+      <a onclick="showPage('browsejobs')">Browse Jobs</a>
+    </div>
+    <div class="auth-links">
+      <a onclick="showPage('login')">Log In</a> | 
+      <a onclick="showPage('signup')">Sign Up</a>
+    </div>
+  </div>
+
+  <!-- Home -->
+  <div class="hero page active" id="home">
+    <h1>Welcome to Freelancer Client Platform</h1>
+    <p>Work smarter with the world’s largest freelance platform. Post your project, connect with professionals, and bring your ideas to life. Explore thousands of skilled freelancers ready to deliver quality results.</p>
+  </div>
+
+  <!-- How It Works -->
+  <div class="page" id="howitworks">
+    <div class="page-content">
+      <h2>How It Works</h2>
+      <p>Our platform connects businesses with skilled freelancers across the globe. Post your project, set your budget, and choose from thousands of qualified experts. Track progress in real-time, communicate with ease, and pay only when satisfied. It’s fast, flexible, and secure – designed to help your ideas succeed.</p>
+    </div>
+  </div>
+
+  <!-- Browse Jobs -->
+  <div class="page" id="browsejobs">
+    <div class="page-content">
+      <h2>Browse Jobs</h2>
+      <p>Explore the latest freelance opportunities waiting for you:</p>
+      <div class="search-bar">
+        <input type="text" id="jobSearch" placeholder="Search jobs..." onkeyup="filterJobs()">
+      </div>
+      <div class="jobs" id="jobList">
+        <div class="job-card"><h3>Web Developer Needed</h3><p>Build a responsive company website using React and Node.js.</p><p><b>Budget:</b> $500 - $1000</p><button>Apply Now</button></div>
+        <div class="job-card"><h3>Logo Designer</h3><p>Create a modern and minimal logo for a startup brand.</p><p><b>Budget:</b> $50 - $150</p><button>Apply Now</button></div>
+        <div class="job-card"><h3>Content Writer</h3><p>Write SEO-friendly blog articles for a travel website.</p><p><b>Budget:</b> $20/article</p><button>Apply Now</button></div>
+        <div class="job-card"><h3>Mobile App Developer</h3><p>Develop an Android app for food delivery services.</p><p><b>Budget:</b> $1000 - $3000</p><button>Apply Now</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login -->
+  <div class="page" id="login">
+    <div class="form-box">
+      <h2>Client Login</h2>
+      <input type="text" placeholder="Username">
+      <input type="password" placeholder="Password">
+      <button onclick="checkLogin()">Login</button>
+      <div class="back-btn" onclick="showPage('home')">← Back to Home</div>
+    </div>
+  </div>
+
+  <!-- Signup -->
+  <div class="page" id="signup">
+    <div class="form-box">
+      <h2>Freelancer Sign Up</h2>
+      <input type="text" placeholder="Username">
+      <input type="password" placeholder="Password">
+      <input type="email" placeholder="Email">
+      <input type="text" placeholder="Contact No">
+      <input type="text" placeholder="Skills Known">
+      <button>Sign Up</button>
+      <div class="back-btn" onclick="showPage('home')">← Back to Home</div>
+    </div>
+  </div>
+
+  <script>
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => {
+        p.style.display="none"; 
+        p.classList.remove("active");
+      });
+      let page = document.getElementById(pageId);
+      page.style.display="flex";
+      setTimeout(()=>page.classList.add("active"),50);
+    }
+
+    function checkLogin() {
+      let username = document.querySelector("#login input[type='text']").value;
+      let password = document.querySelector("#login input[type='password']").value;
+      if(username === "admin" && password === "1234"){
+        alert("Login Successful!");
+        showPage('home');
+      } else {
+        alert("Incorrect Username or Password");
+      }
+    }
+
+    function filterJobs() {
+      let input = document.getElementById("jobSearch").value.toLowerCase();
+      let jobs = document.getElementById("jobList").getElementsByClassName("job-card");
+      for (let i = 0; i < jobs.length; i++) {
+        let jobText = jobs[i].innerText.toLowerCase();
+        jobs[i].style.display = jobText.includes(input) ? "" : "none";
+      }
+    }
+  </script>
+</body>
+</html>
